@@ -10,7 +10,12 @@ class Config {
    private static $me;
 
    public static function initialize() {
-      if (is_null(self::$me)) {
+      return static::getConfig();
+   }
+
+   // Singleton
+   public static function getConfig() {
+      if (is_null(self::$me))
          self::$me = new Config();
       }
       return self::$me;
