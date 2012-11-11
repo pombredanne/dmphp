@@ -45,8 +45,9 @@ class Config {
       $stage = (array)$this->ini['hosts.staging'];
       $prod  = (array)$this->ini['hosts.production'];
 
+      // Attempt to use parse_url(), but fallback to HTTP_HOST if it fails.
       $info = parse_url($_SERVER['HTTP_HOST']);
-      $http_host = $info['host'];
+      $http_host = $info['host'] ?: $_SERVER['HTTP_HOST'];
 
       foreach ($prod as $regex) {
          if (preg_match($regex, $http_host)) {

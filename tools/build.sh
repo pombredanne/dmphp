@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../web" && pwd )"
 
 cd $DIR
 
-if [ ! -d "../libraries/yuicompressor" ]; then
+if [ ! -d "../libraries/yuicompressor/build" ]; then
    echo "Missing required package: libraries/yuicompressor"
    exit 1
 fi

@@ -20,11 +20,11 @@ class DBObject {
          $db = Database::getDatabase();
          $table = static::$table;
 
-         $q_getRow = <<<EOT
+         $sql = <<<EOT
             SELECT * FROM `{$table}`
             WHERE `id` = ?
 EOT;
-         $query = $db->query($q_getRow, array('i', $id_or_data));
+         $query = $db->query($sql, array('i', $id_or_data));
          $this->_data = $db->getRow($query);
       }
    }
@@ -53,8 +53,9 @@ EOT;
       $rows = $db->getRows($query);
 
       $result = array();
-      foreach ($rows as $row)
+      foreach ($rows as $row) {
          $result[] = new $class($row);
+      }
       return $result;
    }
 
@@ -81,15 +82,16 @@ EOT;
          $params[] = $value;
       }
 
-      if (!$set)
+      if (!$set) {
          return false;
+      }
 
       // Combine insert or update in one query.
-      $query = 'INSERT INTO ' . static::$table . ' SET ' .
+      $sql = 'INSERT INTO ' . static::$table . ' SET ' .
          substr($set, 0, -1) . ' ON DUPLICATE KEY UPDATE ' .
          substr($set, 0, -1);
 
-      if (!$db->query($query, $params))
+      if (!$db->query($sql, $params))
          return false;
 
       if ($id = $db->insertId())

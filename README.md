@@ -38,6 +38,7 @@ requires a specific surrounding directory structure.
        │   ├── class.minifier.php
        │   ├── class.page.php
        │   ├── class.router.php
+       │   ├── config.sample.ini
        │   ├── inc.functions.php
        │   ├── inc.master.php
        │   └── tools

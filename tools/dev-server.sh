@@ -1,5 +1,4 @@
-#!/bin/bash
-# Requires PHP 5.4+
+#!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../web" && pwd )"
 
