@@ -7,6 +7,7 @@ basic needs. Features include:
 
   * Request routing `(class.router.php)`
   * PHP templating `(class.page.php)`
+  * CSRF protection `(class.csrf.php)`
   * JS + CSS minification with LESS support `(./tools/build.sh)`
   * MySQL database wrapper `(class.database.php)`
   * Database sessions `(class.dbsession.php)`
@@ -32,6 +33,7 @@ requires a specific surrounding directory structure.
        │   ├── README.md
        │   ├── class.cache.php
        │   ├── class.config.php
+       │   ├── class.csrf.php
        │   ├── class.database.php
        │   ├── class.dbobject.php
        │   ├── class.dbsession.php
