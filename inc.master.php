@@ -9,11 +9,13 @@ require DOC_ROOT . '/framework/inc.functions.php';
 // Load config settings.
 Config::initialize();
 
-// Store session info in the database?
-if (Config::get('dbsessions'))
-  DBSession::register();
+if (php_sapi_name() != 'cli') {
+   // Store session info in the database?
+   if (Config::get('dbsessions'))
+     DBSession::register();
 
-// Initialize the session.
-session_name('dmphps');
-session_start();
+   // Initialize the session.
+   session_name('dmphps');
+   session_start();
+}
 

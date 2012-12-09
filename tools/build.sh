@@ -10,13 +10,11 @@ if [ ! -d "../libraries/yuicompressor/build" ]; then
 fi
 
 if [ "$1" == "clean" ]; then
-   php -r "require '../framework/class.cache.php'; \
-           require '../framework/class.minifier.php'; \
+   php -r "require '../framework/inc.master.php'; \
            Minifier::clean();";
    echo "Cleaned"
 else
-   php -r "require '../framework/class.cache.php'; \
-           require '../framework/class.minifier.php'; \
+   php -r "require '../framework/inc.master.php'; \
            Minifier::build();";
    echo "Completed"
 fi

@@ -29,9 +29,10 @@ class Config {
       $this->ini = parse_ini_file(CONFIG_FILE, true);
 
       // Overrides for dev/staging/prod environments.
-      $server = $this->whichServer();
-      foreach ($this->ini[$server] as $key => $value) {
-         $this->ini[$key] = $value;
+      if (($server = $this->whichServer())) {
+         foreach ($this->ini[$server] as $key => $value) {
+            $this->ini[$key] = $value;
+         }
       }
 
       // Pass along "ini_set." values.
@@ -51,8 +52,8 @@ class Config {
       $prod  = (array)$this->ini['hosts.production'];
 
       // Attempt to use parse_url(), but fallback to HTTP_HOST if it fails.
-      $info = parse_url($_SERVER['HTTP_HOST']);
-      $http_host = @$info['host'] ?: $_SERVER['HTTP_HOST'];
+      $info = parse_url(@$_SERVER['HTTP_HOST']);
+      $http_host = @$info['host'] ?: @$_SERVER['HTTP_HOST'];
 
       foreach ($prod as $regex) {
          if (preg_match($regex, $http_host)) {
@@ -76,7 +77,7 @@ class Config {
    }
 
    public static function get($key) {
-      return self::$me->ini[$key];
+      return self::getConfig()->ini[$key];
    }
 }
 
