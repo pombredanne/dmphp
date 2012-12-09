@@ -11,7 +11,7 @@ Config::initialize();
 
 // Strip out www prefix.
 if (Config::get('strip_www') &&
-    substr($_SERVER['SERVER_NAME'], 0, 4) == 'www.') {
+    substr(@$_SERVER['SERVER_NAME'], 0, 4) == 'www.') {
    $s = @$_SERVER['HTTPS'] ? 's' : '';
    $domain = substr($_SERVER['SERVER_NAME'], 4);
    Page::redirect("http{$s}://{$domain}{$_SERVER['REQUEST_URI']}");
