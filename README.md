@@ -43,9 +43,12 @@ requires a specific surrounding directory structure.
        │   ├── config.sample.ini
        │   ├── inc.functions.php
        │   ├── inc.master.php
-       │   └── tools
-       │       ├── build.sh
-       │       └── dev-server.sh
+       │   ├── tools
+       │   │   ├── build.sh
+       │   │   └── dev-server.sh
+       │   └── web
+       │       ├── .htaccess
+       │       └── index.php
        ├── handlers
        ├── libraries
        ├── objects
@@ -53,7 +56,8 @@ requires a specific surrounding directory structure.
        │   ├── error.tpl.php
        │   └── layout.tpl.php
        └── web
-           ├── index.php
+           ├── .htaccess -> ../framework/web/.htaccess
+           ├── index.php -> ../framework/web/index.php
            ├── scripts
            └── styles
 
