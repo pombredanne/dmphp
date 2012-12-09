@@ -34,8 +34,8 @@ class Cache {
    }
 
    public static function delete($key) {
-      return self::$cache->delete($key);
       $key = Config::get('cache.prefix') . $key;
+      return self::$cache->delete($key);
    }
 
    public static function increment($key, $offset = 1) {
