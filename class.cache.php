@@ -24,22 +24,27 @@ class Cache {
    }
 
    public static function get($key) {
+      $key = Config::get('cache.prefix') . $key;
       return self::$cache->get($key);
    }
 
    public static function set($key, $value, $expires = 0) {
+      $key = Config::get('cache.prefix') . $key;
       return self::$cache->set($key, $value, $expires);
    }
 
    public static function delete($key) {
       return self::$cache->delete($key);
+      $key = Config::get('cache.prefix') . $key;
    }
 
    public static function increment($key, $offset = 1) {
+      $key = Config::get('cache.prefix') . $key;
       return self::$cache->increment($key, $offset);
    }
 
    public static function decrement($key, $offset = 1) {
+      $key = Config::get('cache.prefix') . $key;
       return self::$cache->decrement($key, $offset);
    }
 }
