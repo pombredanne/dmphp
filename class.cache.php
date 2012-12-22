@@ -10,12 +10,12 @@ class Cache {
 
    public static function init() {
       if (!self::$cache) {
-         if (APCCache::enabled()) {
-            self::$cache = new APCCache();
-         }
-         else if (class_exists('Memcached')) {
+         if (class_exists('Memcached')) {
             self::$cache = new Memcached();
             self::$cache->addServer('localhost', 11211);
+         }
+         else if (APCCache::enabled()) {
+            self::$cache = new APCCache();
          }
          else {
             self::$cache = new DummyCache();
