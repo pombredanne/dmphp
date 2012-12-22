@@ -82,6 +82,20 @@ class Page {
       if (Config::get('minify.css')) {
          self::$stylesheets = Minifier::minifiedPaths(self::$stylesheets);
       }
+
+      if (($cdn = @Config::get('cdn'))) {
+         foreach (self::$scripts as &$script) {
+            if (!preg_match('#^(https?:)?//#', $script)) {
+               $script = "{$cdn}{$script}";
+            }
+         }
+
+         foreach (self::$stylesheets as &$stylesheet) {
+            if (!preg_match('#^(https?:)?//#', $stylesheet)) {
+               $stylesheet = "{$cdn}{$stylesheet}";
+            }
+         }
+      }
    }
 
    public static function json($data) {
