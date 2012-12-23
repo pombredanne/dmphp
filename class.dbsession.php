@@ -1,7 +1,7 @@
 <?php
 /**
  * Handler for storing PHP sessions in the database instead of on disk.
- * Enabled/disabled via config.ini's `dbsessions` setting.
+ * Enabled/disabled via config.ini's `sessions` setting.
  */
 
 class DBSession {

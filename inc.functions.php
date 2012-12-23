@@ -46,7 +46,9 @@ function plural($num, $plural, $singular = '') {
 }
 
 function quit() {
-   session_write_close();
+   if (Config::get('sessions')) {
+      session_write_close();
+   }
    exit;
 }
 

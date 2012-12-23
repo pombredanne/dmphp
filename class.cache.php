@@ -23,6 +23,16 @@ class Cache {
       }
    }
 
+   public static function registerForSessions() {
+     if (!class_exists('Memcached'))
+       return false;
+
+     ini_set('session.save_handler', 'memcached');
+     ini_set('session.save_path', 'localhost:11211');
+
+     return true;
+   }
+
    public static function get($key) {
       $key = Config::get('cache.prefix') . $key;
       return self::$cache->get($key);

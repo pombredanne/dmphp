@@ -19,12 +19,15 @@ if (Config::get('strip_www') &&
 
 // If not on a CLI, start the session.
 if (php_sapi_name() != 'cli') {
-   // Store session info in the database?
-   if (Config::get('dbsessions'))
-     DBSession::register();
+   if (($sessions = Config::get('sessions'))) {
+      switch ($sessions) {
+      case 'memcached': Cache::registerForSessions(); break;
+      case 'db': DBSession::register(); break;
+      }
 
-   // Initialize the session.
-   session_name('dmphps');
-   session_start();
+      // Initialize the session.
+      session_name('dmphps');
+      session_start();
+   }
 }
 
