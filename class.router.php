@@ -53,6 +53,7 @@ class Router {
 
          // Put arguments in their proper order.
          array_pop($arguments);
+         $arguments = array_filter($arguments);
          $this->arguments = array_reverse($arguments);
 
          // Quick security check.
