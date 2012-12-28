@@ -9,12 +9,12 @@ require DOC_ROOT . '/framework/inc.functions.php';
 // Load config settings.
 Config::initialize();
 
-// Strip out www prefix.
-if (Config::get('strip_www') &&
-    substr(@$_SERVER['SERVER_NAME'], 0, 4) == 'www.') {
+// Redirect to canonical host.
+$host = @$_SERVER['SERVER_NAME'];
+$canonical = @Config::get('host.canonical');
+if ($canonical && $host && $host != $canonical) {
    $s = @$_SERVER['HTTPS'] ? 's' : '';
-   $domain = substr($_SERVER['SERVER_NAME'], 4);
-   Page::redirect("http{$s}://{$domain}{$_SERVER['REQUEST_URI']}");
+   Page::redirect("http{$s}://{$canonical}{$_SERVER['REQUEST_URI']}");
 }
 
 // If not on a CLI, start the session.
