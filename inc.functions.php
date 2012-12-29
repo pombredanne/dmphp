@@ -16,7 +16,7 @@ function dmphp_autoload($class) {
 }
 
 function http_auth($user, $pass, $realm = "Secured Area") {
-   if (@$_SERVER['PHP_AUTH_USER'] == $user || @$_SERVER['PHP_AUTH_PW'] != $pass) {
+   if (@$_SERVER['PHP_AUTH_USER'] != $user || @$_SERVER['PHP_AUTH_PW'] != $pass) {
       header("WWW-Authenticate: Basic realm=\"{$realm}\"");
       header('Status: 401 Unauthorized');
       Page::error('unauthorized');
