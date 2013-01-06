@@ -15,15 +15,12 @@ class Minifier {
 
       $results = array();
 
-      // 1. Clean old minified files.
-      static::clean();
-
-      // 2. Run yuicompressor..
+      // 1. Run yuicompressor.
       $css_count  = self::execute('css');
       $less_count = self::execute('less');
       $js_count   = self::execute('js');
 
-      // 3. Apply the hash prefix.
+      // 2. Apply the hash prefix.
       $files = shell_exec("find . -name '*.min.css' -or -name '*.min.js'");
       $files = array_filter(explode("\n", $files));
       foreach ($files as $file) {
@@ -41,7 +38,7 @@ class Minifier {
          }
       }
 
-      // 4. Update the config file.
+      // 3. Update the config file.
       self::writeConfig($results);
    }
 
@@ -114,11 +111,12 @@ class Minifier {
 
    private static function writeConfig($data) {
       file_put_contents(MINIFIER_JSON_FILE, json_encode($data));
+      Cache::delete(MINIFIER_CACHE_KEY);
    }
 
    private static function deleteConfig() {
-      Cache::delete(MINIFIER_CACHE_KEY);
       @unlink(MINIFIER_JSON_FILE);
+      Cache::delete(MINIFIER_CACHE_KEY);
    }
 }
 
