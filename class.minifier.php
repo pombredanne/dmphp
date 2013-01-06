@@ -13,6 +13,9 @@ class Minifier {
    public static function build() {
       assert(substr(getcwd(), -4) == '/web') or die();
 
+      // Remove old minified files.
+      self::deleteFiles();
+
       $results = array();
 
       // 1. Run yuicompressor.
@@ -46,8 +49,7 @@ class Minifier {
       assert(substr(getcwd(), -4) == '/web') or die();
 
       self::deleteConfig();
-      shell_exec("find scripts -name '*.min.js' -exec rm {} \;");
-      shell_exec("find styles -name '*.min.css' -exec rm {} \;");
+      self::deleteFiles();
    }
 
    public static function minifiedPaths($paths) {
@@ -117,6 +119,11 @@ class Minifier {
    private static function deleteConfig() {
       @unlink(MINIFIER_JSON_FILE);
       Cache::delete(MINIFIER_CACHE_KEY);
+   }
+
+   private static function deleteFiles() {
+      shell_exec("find scripts -name '*.min.js' -exec rm {} \;");
+      shell_exec("find styles -name '*.min.css' -exec rm {} \;");
    }
 }
 
