@@ -28,6 +28,12 @@ if (php_sapi_name() != 'cli') {
       // Initialize the session.
       session_name('dmphps');
       session_start();
+   } else {
+      // Mimic session_cache_limiter('nocache')
+      // http://us2.php.net/session_cache_limiter
+      header('Expires: Thu, 19 Nov 1981 08:52:00 GMT');
+      header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+      header('Pragma: no-cache');
    }
 }
 
