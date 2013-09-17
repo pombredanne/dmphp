@@ -12,7 +12,8 @@ Config::initialize();
 // Redirect to canonical host.
 $host = @$_SERVER['SERVER_NAME'];
 $canonical = @Config::get('host.canonical');
-if ($canonical && $host && $host != $canonical) {
+$subdomains = @Config::get('host.subdomains');
+if ($canonical && $host && $host != $canonical && !in_array($host, $subdomains)) {
    $s = @$_SERVER['HTTPS'] ? 's' : '';
    Page::redirect("http{$s}://{$canonical}{$_SERVER['REQUEST_URI']}");
 }

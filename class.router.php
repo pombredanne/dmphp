@@ -24,6 +24,13 @@ class Router {
       // Strip query string from request path.
       $uri = preg_replace('/\?.*?$/', '', $_SERVER['REQUEST_URI']);
 
+      // Add a directory to the top-level path for subdomains.
+      $host = @$_SERVER['SERVER_NAME'];
+      $subdomains = @Config::get('host.subdomains');
+      if (in_array($host, $subdomains)) {
+         $uri = '/' . substr($host, 0, strpos($host, '.')) . $uri;
+      }
+
       // First check the cache.
       $key = "Router-{$uri}";
       if (($value = Cache::get($key))) {
