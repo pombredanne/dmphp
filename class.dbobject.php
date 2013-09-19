@@ -35,7 +35,8 @@ class DBObject {
    }
 
    // Find all, find one, or find with query suffix.
-   public static function find($id = false, $suffix = '') {
+   public static function find($id = false, $suffix = '', $params = null, $types = null) {
+      $table = static::$table;
       $class = get_called_class();
 
       // Find by id.
@@ -46,7 +47,7 @@ class DBObject {
 
       // Find all.
       $db = Database::getDatabase();
-      $query = $db->query('SELECT * FROM ' . static::$table . " {$suffix}");
+      $query = $db->query("SELECT * FROM {$table} {$suffix}", $params, $types);
       $rows = $db->getRows($query);
 
       $result = array();
@@ -74,6 +75,7 @@ class DBObject {
       // Build the parameter list.
       $set = $columns = $values = $params = array();
       foreach ($this->_data as $key => $value) {
+         if ($key[0] == '_') continue;
          $set[] = "`{$key}`=?";
          $columns[] = "`{$key}`";
          $values[] = '?';

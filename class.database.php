@@ -102,6 +102,15 @@ class Database {
       return $stmt->fetchAll(PDO::FETCH_COLUMN);
    }
 
+   public function getAllAssoc($stmt, $key, $value = null) {
+      $result = array();
+      $rows = $this->getRows($stmt);
+      foreach ($rows as $row) {
+         $result[$row[$key]] = $value ? $row[$value] : $row;
+      }
+      return $result;
+   }
+
    public function getRow($stmt) {
       return $stmt->fetch(PDO::FETCH_ASSOC);
    }
