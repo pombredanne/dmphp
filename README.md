@@ -9,7 +9,7 @@ basic needs. Features include:
   * PHP templating `(class.page.php)`
   * CSRF protection `(class.csrf.php)`
   * JS + CSS minification with LESS support `(./tools/build.sh)`
-  * MySQL database wrapper `(class.database.php)`
+  * Database wrapper `(class.database.php)`
   * Database sessions `(class.dbsession.php)`
   * Database-backed objects `(class.dbobject.php)`
   * Cache wrapper for APC/memcached `(class.cache.php)`
