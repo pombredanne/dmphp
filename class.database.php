@@ -6,7 +6,8 @@
 class Database {
    private static $me;
 
-   private $pdo;
+   public $pdo;
+
    private $is_connected;
    private $affected_rows;
    private $insert_id;
@@ -18,11 +19,11 @@ class Database {
       return self::$me;
    }
 
-   public function __construct() {
+   public function __construct($dsn = null, $username = null, $password = null) {
       $this->pdo = new PDO(
-         Config::get('db.dsn'),
-         @Config::get('db.username'),
-         @Config::get('db.password')
+         $dsn ?: Config::get('db.dsn'),
+         $username ?: @Config::get('db.username'),
+         $password ?: @Config::get('db.password')
       );
 
       if ($this->pdo) {
@@ -40,13 +41,13 @@ class Database {
 
       // Execute as a non-prepared statement if possible (for performance).
       if (is_null($params)) {
-         if (!($result = $this->pdo->query($sql))) {
+         if (!($stmt = $this->pdo->query($sql))) {
             $error = $this->pdo->errorInfo();
             trigger_error("Query failed: ({$error[0]}) " .
                           "{$error[2]}\n\n{$sql}\n\n");
             return false;
          }
-         return $result;
+         return $stmt;
       }
 
       // Prepare.
@@ -105,7 +106,7 @@ class Database {
       return $stmt->fetch(PDO::FETCH_ASSOC);
    }
 
-   public function getRows($result) {
+   public function getRows($stmt) {
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
    }
 
