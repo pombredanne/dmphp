@@ -37,6 +37,13 @@ function base62encode($val, $base=62, $chars='0123456789abcdefghijklmnopqrstuvwx
    return $str;
 }
 
+function base62rand($length = 32) {
+   $chars = array('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+   $result = base64_encode(openssl_random_pseudo_bytes(ceil($length * 0.8)));
+   $base62 = strtr($result, '+/', $chars[array_rand($chars)] . $chars[array_rand($chars)]);
+   return substr($base62, 0, $length);
+}
+
 function escape($string) {
    return htmlentities($string, ENT_QUOTES, "UTF-8");
 }
