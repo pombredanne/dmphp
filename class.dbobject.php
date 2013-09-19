@@ -17,14 +17,11 @@ class DBObject {
       }
       // ...or pull from the database.
       else if ($id_or_data) {
-         $db = Database::getDatabase();
          $table = static::$table;
+         $sql = "SELECT * FROM `{$table}` WHERE `id` = ?";
 
-         $sql = <<<EOT
-            SELECT * FROM `{$table}`
-            WHERE `id` = ?
-EOT;
-         $query = $db->query($sql, array('i', $id_or_data));
+         $db = Database::getDatabase();
+         $query = $db->query($sql, array($id_or_data), 'i');
          $this->_data = $db->getRow($query);
       }
    }
@@ -62,7 +59,7 @@ EOT;
    public static function deleteWithId($id) {
       $db = Database::getDatabase();
       $query = 'DELETE FROM ' . static::$table . ' WHERE `id` = ?';
-      $db->query($query, array('i', $id));
+      $db->query($query, array($id), 'i');
    }
 
    public function delete() {
@@ -70,32 +67,42 @@ EOT;
    }
 
    public function save() {
+      $table = static::$table;
       $class = get_called_class();
       $db = Database::getDatabase();
 
       // Build the parameter list.
-      $set = '';
-      $params = array('');
+      $set = $columns = $values = $params = array();
       foreach ($this->_data as $key => $value) {
-         $set .= "`{$key}` = ?,";
-         $params[0] .= 's';
+         $set[] = "`{$key}`=?";
+         $columns[] = "`{$key}`";
+         $values[] = '?';
          $params[] = $value;
       }
 
-      if (!$set) {
+      if (count($columns) == 0) {
          return false;
       }
 
-      // Combine insert or update in one query.
-      $sql = 'INSERT INTO ' . static::$table . ' SET ' .
-         substr($set, 0, -1) . ' ON DUPLICATE KEY UPDATE ' .
-         substr($set, 0, -1);
+      // Insert or update based on object state.
+      if ($this->id) {
+         $set = implode(',', $set);
+         $params[] = $this->id;
+         $sql = "UPDATE {$table} SET {$set} WHERE `id` = ?";
+      }
+      else {
+         $columns = implode(',', $columns);
+         $values = implode(',', $values);
+         $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$values})";
+      }
 
-      if (!$db->query($sql, $params))
+      if (!$db->query($sql, $params)) {
          return false;
+      }
 
-      if ($id = $db->insertId())
+      if ($id = $db->insertId()) {
          $this->id = $id;
+      }
 
       return true;
    }

@@ -45,6 +45,10 @@ function plural($num, $plural, $singular = '') {
    return (($num == 1) ? $singular : $plural);
 }
 
+function array_is_assoc($array) {
+   return (bool)count(array_filter(array_keys($array), 'is_string'));
+}
+
 function quit() {
    if (Config::get('sessions')) {
       session_write_close();

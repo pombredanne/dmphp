@@ -1,12 +1,13 @@
 <?php
 /**
- * Wrapper around MySQLi to simplify using prepared statements.
+ * Wrapper around PDO to simplify using prepared statements.
  */
 
 class Database {
    private static $me;
 
-   private $mysqli;
+   private $pdo;
+   private $is_connected;
    private $affected_rows;
    private $insert_id;
 
@@ -18,66 +19,70 @@ class Database {
    }
 
    public function __construct() {
-      $this->mysqli = new mysqli(
-         Config::get('db.host'),
-         Config::get('db.username'),
-         Config::get('db.password'),
-         Config::get('db.database'),
-         Config::get('db.port')
+      $this->pdo = new PDO(
+         Config::get('db.dsn'),
+         @Config::get('db.username'),
+         @Config::get('db.password')
       );
+
+      if ($this->pdo) {
+        $this->is_connected = true;
+      }
    }
 
    public function isConnected() {
-      return !is_null(@$this->mysqli->host_info);
+      return $this->is_connected;
    }
 
-   public function query($sql, $params = null) {
+   public function query($sql, $params = null, $types = null) {
       if (!$this->isConnected())
          return false;
 
       // Execute as a non-prepared statement if possible (for performance).
       if (is_null($params)) {
-         if (!($result = $this->mysqli->query($sql))) {
-            trigger_error("Query failed: ({$this->mysqli->errno}) " .
-                          "{$this->mysqli->error}\n\n{$sql}\n\n");
+         if (!($result = $this->pdo->query($sql))) {
+            $error = $this->pdo->errorInfo();
+            trigger_error("Query failed: ({$error[0]}) " .
+                          "{$error[2]}\n\n{$sql}\n\n");
             return false;
          }
          return $result;
       }
 
       // Prepare.
-      if (!($stmt = $this->mysqli->prepare($sql))) {
-         trigger_error("Prepare failed: ({$this->mysqli->errno}) " .
-                       "{$this->mysqli->error}\n\n{$sql}\n\n");
+      if (!($stmt = $this->pdo->prepare($sql))) {
+         $error = $this->pdo->errorInfo();
+         trigger_error("Prepare failed: ({$error[0]}) " .
+                       "{$error[2]}\n\n{$sql}\n\n");
          return false;
       }
 
       // Bind.
-      $refParams = array();
-      foreach ($params as $key => $value) {
-         $refParams[$key] = &$params[$key];
-      }
-      if (!call_user_func_array(array($stmt, 'bind_param'), $params)) {
-         trigger_error("Binding parameters failed: ({$stmt->errno}) " .
-                       "{$stmt->error}\n\n{$sql}\n\n");
+      $isAssociative = array_is_assoc($params);
+      foreach ($params as $key => &$value) {
+         $type = self::PDOType(@$types[$key]);
+         $key = $isAssociative ? $key : $key + 1;
+         if (!$stmt->bindParam($key, $value, $type)) {
+            $error = $this->pdo->errorInfo();
+            trigger_error("Binding parameters failed: ({$error[0]}) " .
+                          "{$error[2]}\n\n{$sql}\n\n");
+         }
       }
 
       // Execute.
       if (!$stmt->execute()) {
-         trigger_error("Execute failed: ({$stmt->errno}) " .
-                       "{$stmt->error}\n\n{$sql}\n\n");
+         $error = $this->pdo->errorInfo();
+         trigger_error("Execute failed: ({$error[0]}) " .
+                       "{$error[2]}\n\n{$sql}\n\n");
       }
 
       $is_write = preg_match('/^ *(INSERT|UPDATE|REPLACE|DELETE)/i', $sql);
       if ($is_write) {
-         $this->affected_rows = $stmt->affected_rows;
-         $this->insert_id = $stmt->insert_id;
+         $this->affected_rows = $stmt->rowCount();
+         $this->insert_id = $this->pdo->lastInsertId();
       }
 
-      $result = $stmt->get_result();
-      $stmt->close();
-
-      return $result;
+      return $stmt;
    }
 
    public function affectedRows() {
@@ -88,35 +93,30 @@ class Database {
       return $this->insert_id;
    }
 
-   public function numRows($result) {
-      return $result->num_rows;
+   public function getValue($stmt) {
+      return $stmt->fetchColumn();
    }
 
-   public function getValue($result) {
-      $row = $result->fetch_row();
-      return @$row[0];
+   public function getValues($stmt) {
+      return $stmt->fetchAll(PDO::FETCH_COLUMN);
    }
 
-   public function getValues($result) {
-      $column = array();
-      $result->data_seek(0);
-      while (($row = $result->fetch_row())) {
-         $column[] = $row[0];
-      }
-      return $column;
-   }
-
-   public function getRow($result) {
-      return $result->fetch_assoc();
+   public function getRow($stmt) {
+      return $stmt->fetch(PDO::FETCH_ASSOC);
    }
 
    public function getRows($result) {
-      $rows = array();
-      $result->data_seek(0);
-      while (($row = $result->fetch_assoc())) {
-         $rows[] = $row;
+      return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   }
+
+   private function PDOType($char) {
+      switch ($char) {
+      case 'b': return PDO::PARAM_BOOL;
+      case 'n': return PDO::PARAM_NULL;
+      case 'i': return PDO::PARAM_INT;
+      case 'l': return PDO::PARAM_LOB;
+      case 's': default: return PDO::PARAM_STR;
       }
-      return $rows;
    }
 }
 

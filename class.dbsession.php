@@ -29,24 +29,24 @@ class DBSession {
    public static function read($id) {
       $db = Database::getDatabase();
       $sql = "SELECT `data` FROM `sessions` WHERE `id` = ?";
-      $query = $db->query($sql, array('i', $id));
+      $query = $db->query($sql, array($id), 'i');
       return $db->getValue($query) ?: '';
    }
 
    public static function write($id, $data) {
       $db = Database::getDatabase();
-      $db->query('DELETE FROM `sessions` WHERE `id` = ?', array('i', $id));
+      $db->query('DELETE FROM `sessions` WHERE `id` = ?', array($id), 'i');
 
       $sql = 'INSERT INTO `sessions` (`id`, `data`, `updated_on`) ' .
              'VALUES (?, ?, UNIX_TIMESTAMP())';
-      $db->query($sql, array('is', $id, $data));
+      $db->query($sql, array($id, $data), 'is');
 
       return $db->affectedRows() == 1;
    }
 
    public static function destroy($id) {
       $db = Database::getDatabase();
-      $db->query('DELETE FROM `sessions` WHERE `id` = ?', array('i', $id));
+      $db->query('DELETE FROM `sessions` WHERE `id` = ?', array($id), 'i');
       return $db->affectedRows() == 1;
    }
 
