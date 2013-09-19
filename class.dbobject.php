@@ -35,19 +35,19 @@ class DBObject {
    }
 
    // Find all, find one, or find with query suffix.
-   public static function find($id = false, $suffix = '', $params = null, $types = null) {
+   public static function find($search = '', $params = null, $types = null) {
       $table = static::$table;
       $class = get_called_class();
 
       // Find by id.
-      if ($id !== false) {
-         $object = new $class((int)$id);
+      if (is_numeric($search)) {
+         $object = new $class((int)$search);
          return $object->id ? $object : false;
       }
 
       // Find all.
       $db = Database::getDatabase();
-      $query = $db->query("SELECT * FROM {$table} {$suffix}", $params, $types);
+      $query = $db->query("SELECT * FROM {$table} {$search}", $params, $types);
       $rows = $db->getRows($query);
 
       $result = array();
