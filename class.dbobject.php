@@ -102,11 +102,11 @@ class DBObject {
          return false;
       }
 
-      if ($id = $db->insertId()) {
+      if (($id = $db->insertId())) {
          $this->id = $id;
       }
 
-      return true;
+      return $db->affectedRows() > 0;
    }
 }
 
