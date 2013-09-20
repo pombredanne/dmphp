@@ -8,7 +8,7 @@ define('MINIFIER_JSON_FILE', '../framework/minifier.json');
 define('MINIFIER_CACHE_KEY', 'minifier.data');
 
 class Minifier {
-   private static $yui_jar = '../libraries/yuicompressor/build/yuicompressor-*.jar';
+   private static $yui_jar = '../libraries/yuicompressor-*.jar';
 
    public static function build() {
       assert(substr(getcwd(), -4) == '/web') or die();
