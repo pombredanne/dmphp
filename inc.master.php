@@ -26,9 +26,34 @@ if (php_sapi_name() != 'cli') {
       case 'db': DBSession::register(); break;
       }
 
+      if (($lifetime = Config::get('sessions.lifetime'))) {
+         ini_set('session.gc_maxlifetime', $lifetime);
+         ini_set('session.cookie_lifetime', $lifetime);
+      }
+
       // Initialize the session.
       session_name('dmphps');
       session_start();
+
+      if ($lifetime) {
+         $now = time();
+         $activeKey = 'dmphps-active';
+         $createdKey = 'dmphps-created';
+
+         // Actively destroy the session if it's been inactive too long.
+         if (isset($_SESSION[$activeKey]) &&
+             $now - $_SESSION[$activeKey] > $lifetime) {
+            session_unset();
+            session_destroy();
+         }
+         $_SESSION[$activeKey] = $now;
+
+         // Regenerate the session ID every so often.
+         if ($now - @$_SESSION[$createdKey] > 1800) {
+            session_regenerate_id(true);
+            $_SESSION[$createdKey] = time();
+         }
+      }
    } else {
       // Mimic session_cache_limiter('nocache')
       // http://us2.php.net/session_cache_limiter

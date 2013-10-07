@@ -77,7 +77,7 @@ class Config {
    }
 
    public static function get($key) {
-      return self::getConfig()->ini[$key];
+      return @self::getConfig()->ini[$key];
    }
 }
 
