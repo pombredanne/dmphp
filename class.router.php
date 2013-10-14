@@ -7,7 +7,7 @@ class Router {
    public static $cache_expires = 0;
 
    // Core members
-   private $handler = 'index.php';
+   private $handler = null;
    private $arguments = array();
 
    // Convenience accessors
@@ -39,20 +39,26 @@ class Router {
       }
       // If not already cached, find the handler by traversing up the path.
       else {
-         // Dynamically determine which handler to run.
+         // Separate the URL into an array of pieces.
          $pieces = explode('/', substr($uri, 1));
 
          do {
-            // Default to index.php if nothing matched.
-            if (!($path = implode('/', $pieces))) {
-               $handler = DOC_ROOT . "/handlers/{$this->handler}";
-            }
-            else {
-               // Check for path/index.php or path.php
+            // Concatenate the pieces into a path string.
+            $path = implode('/', $pieces);
+
+            if ($path) {
+               // Replace dashes in the URL with underscores on the filesystem.
+               $path = str_replace('-', '_', $path);
+
+               // First look for {path}/index.php, then {path}.php.
                $handler = DOC_ROOT . "/handlers/{$path}/index.php";
                if (!file_exists($handler)) {
                   $handler = DOC_ROOT . "/handlers/{$path}.php";
                }
+            }
+            // Default to index.php if nothing matched.
+            else {
+               $handler = DOC_ROOT . "/handlers/index.php";
             }
 
             // Save unmatched tokens as arguments.
